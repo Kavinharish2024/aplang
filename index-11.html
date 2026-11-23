@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Allusion Academy</title>
+<style>
+:root{--bg:#faf6ee;--card:#fff;--tx:#2a2233;--mu:#6b6475;--ac:#7c3aed;--ok:#16a34a;--no:#dc2626;--bd:#e4dccb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17141c;--card:#231f2c;--tx:#f1ecf8;--mu:#a39bb0;--ac:#a78bfa;--bd:#3a3347;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17141c;--card:#231f2c;--tx:#f1ecf8;--mu:#a39bb0;--ac:#a78bfa;--bd:#3a3347;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{margin:0;font:700 24px Georgia,serif}.sub{color:var(--mu);margin:2px 0 12px}
+nav{display:flex;gap:8px;margin:12px 0}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;padding:10px 14px}
+nav button{flex:1;font-weight:600}nav .on,.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{text-align:left;position:relative}.tile b{display:block}.tile span{font-size:28px}.done:after{content:"✓";position:absolute;top:8px;right:10px;color:var(--ok);font-weight:700}
+.bar{height:8px;background:var(--bd);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.pn{background:var(--card);border:3px solid var(--tx);border-radius:6px;padding:10px;text-align:center}.pn .em{font-size:56px;line-height:1.2}.pn p{margin:6px 0 0;text-align:left;font-size:15px}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+.opt{display:block;width:100%;text-align:left;margin:8px 0}.opt.ok{background:var(--ok);color:#fff}.opt.no{background:var(--no);color:#fff}
+.tag{display:inline-block;background:var(--bd);border-radius:99px;padding:2px 10px;margin:2px;font-size:14px}
+.flip{min-height:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:18px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row button{flex:1}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:700px){.two{grid-template-columns:1fr}}.vw{position:relative;padding-top:56.25%}.vw iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px}.pr{display:flex;gap:8px;align-items:flex-start;margin:6px 0}.pr .em{font-size:26px}.pr p{margin:0;font-size:15px}.in{flex:3;padding:8px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;min-width:0}
+</style></head><body><main>
+<h1>📖 Allusion Academy</h1><div class="sub">Learn the story → get quizzed → lock it in.</div><div class="sub" id="wh"></div>
+<div class="bar"><i id="pb" style="width:0"></i></div><div class="sub" id="pt"></div>
+<nav><button id="t0" onclick="go(0)">📚 Learn</button><button id="t1" onclick="go(1)">🃏 Cards</button><button id="t2" onclick="go(2)">⚡ Quiz</button><button id="t3" onclick="go(3)">🏛️ Vocab</button></nav>
+<div id="app"></div></main>
+<script>
+let U="";try{U=localStorage.getItem("au")||""}catch(e){}
+const P=k=>"aa:"+U+":"+k;let rr=()=>{};
+const D=[
+["Adam and Eve","🌳 🐍 🍎",["God places the first couple in the Garden of Eden.","A serpent tempts Eve to eat the forbidden fruit (the “apple”); Adam eats too.","They notice they’re naked, sew fig leaves, and are cast out and cursed."],"Loss of innocence, temptation, the Fall","Garden of Eden,fig leaf,apple,serpent,curse"],
+["Cain and Abel","🌾 🐑 ⚔️",["Brothers Cain (farmer) and Abel (shepherd) make offerings; God favors Abel’s.","Jealous Cain kills Abel.","God marks Cain and sends him to wander."],"Jealousy, first murder, sibling rivalry, guilt","mark of Cain"],
+["Noah and the Flood","🚢 🌧️ 🕊️",["God sees wickedness and tells righteous Noah to build an ark with pairs of animals.","A great flood destroys everything else.","A dove returns with an olive leaf; God sets a rainbow as a promise."],"Renewal, God’s covenant, hope after destruction","the dove,the rainbow"],
+["Tower of Babel","🗼 🗣️ 🌍",["People build a tower to reach heaven.","God confuses their language so they can’t understand each other.","They scatter across the earth."],"Pride, confusion, human overreach","Tower of Babel"],
+["Abraham","⭐ 👴 🔪",["God promises old Abraham and Sarah descendants; Hagar bears Ishmael.","Sarah later has Isaac.","God tests Abraham by asking him to sacrifice Isaac, then stops him."],"Faith, obedience, father of a nation","Sarah,Hagar,Ishmael"],
+["Lot and his Wife","🔥 🏙️ 🧂",["Angels warn Lot to flee wicked Sodom and Gomorrah.","Fire falls on the cities.","Lot’s wife looks back and turns into a pillar of salt."],"Disobedience, looking back at the past, divine punishment","Sodom and Gomorrah"],
+["Jacob and Esau","🍲 🪜 👴",["Twins: Esau sells his birthright to Jacob for a mess of potage (stew).","Jacob tricks blind Isaac into giving him Esau’s blessing.","Fleeing, Jacob dreams of a ladder to heaven."],"Trickery, giving up something valuable for a short-term need","mess of potage,ladder,Isaac and Rebecca,Rachel and Leah"],
+["Joseph","🧥 🕳️ 💭",["Jacob’s favorite son gets a coat of many colors; jealous brothers sell him into Egypt.","Potiphar’s wife lies about him and he’s jailed, but he interprets dreams.","He interprets Pharaoh’s dream and becomes ruler, saving Egypt from famine."],"Betrayal turned to triumph, favoritism, forgiveness","coat of many colors,sold into Egypt,Potiphar’s wife,Pharaoh’s dream"],
+["Moses","🌿 🔥 🌊",["Baby Moses is hidden in the bulrushes; later God speaks from the burning bush.","Plagues and the Passover free the Israelites, who made bricks without straw.","The Red Sea parts, and Moses receives the Ten Commandments."],"Liberation, leadership, law","bulrushes,burning bush,Aaron’s rod,Passover,bricks without straw,crossing the Red Sea,Ten Commandments"],
+["David and Goliath","🪨 🧑‍🌾 👹",["Shepherd boy David faces giant Goliath, armed with just a sling.","A single stone brings Goliath down.","Later David becomes king, befriends Jonathan, and sins with Bathsheba; son Absalom rebels."],"Underdog victory, courage, a fall from grace","Goliath,Jonathon,Bathsheba,Absalom"],
+["Samson","💇 🦁 🏛️",["Samson has superhuman strength from his uncut hair.","Delilah learns the secret and has his hair cut.","Blinded, he pulls down the temple pillars."],"Strength undone by weakness, betrayal by a lover","Samson"],
+["Ruth and Naomi","🌾 🤝 💛",["Widow Naomi returns home; her daughter-in-law Ruth refuses to leave her.","Ruth gleans grain in the fields of Boaz.","They marry; Ruth becomes ancestor of David."],"Loyalty, devotion","Ruth and Naomi"],
+["Solomon","👑 ⚖️ 🏛️",["Young King Solomon asks God for wisdom.","Two women claim one baby; he offers to cut it in half to find the real mother.","He builds the great Temple."],"Wisdom, fair judgment","Solomon"],
+["Job","😢 🏚️ 🙏",["Righteous, wealthy Job loses family, wealth, and health in a test.","Friends say he must have sinned; he keeps faith.","God restores everything."],"Suffering, patience, faith under trial","Job"],
+["Jonah","🐋 ⛈️ 🏙️",["God tells Jonah to warn Nineveh; he flees by ship.","A storm hits and he’s swallowed by a great fish for three days.","He obeys and Nineveh repents."],"Running from duty, repentance","Jonah"],
+["Daniel","🦁 ✍️ 👑",["Daniel serves Babylon’s kings and reads the writing on the wall, predicting the king’s fall.","Rivals trick the king into punishing Daniel’s prayers.","Thrown into the lion’s den, Daniel survives."],"Faith protects, warning of doom, integrity","writing on the wall,lion’s den"],
+["Ahab and Jezebel","👸 🍇 🔥",["Wicked King Ahab and Queen Jezebel worship Baal.","Jezebel has Naboth killed to seize his vineyard.","The prophet Elijah condemns them."],"Evil, manipulation, a wicked woman","Elijah"],
+["Nativity","⭐ 👶 🐑",["Mary and Joseph travel to Bethlehem.","Jesus is born in a manger.","Shepherds and wise men come to honor him."],"Birth of Jesus, humility, hope","Mary and Joseph,shepherds,wise men,Bethlehem"],
+["Prodigal Son","💰 🐷 🏠",["A son demands his inheritance and wastes it.","Broke, he feeds pigs and decides to go home.","His father runs to welcome him with a feast."],"Forgiveness, return after wasteful behavior","Prodigal Son"],
+["Good Samaritan","🤕 🚶 🤲",["A man is beaten and left on the road.","A priest and a Levite pass by.","A Samaritan, an outsider, helps him."],"Compassion for anyone, helping strangers","Good Samaritan"],
+["Walking on Water","🌊 🚣 🚶",["Jesus’s disciples are in a boat during a storm.","Jesus walks toward them on the water.","Peter tries but sinks when he doubts."],"Faith over fear, miracles","Walking on water"],
+["Parable of the Talents","💰 ⛏️ 😠",["A master gives three servants money before leaving.","Two invest and double it; one buries his.","The master rewards the first two."],"Use your gifts, don’t waste them","talents"],
+["Whited Sepulcher","⬜ ⚰️ 🎭",["Jesus criticizes Pharisees as hypocrites.","They’re like whitewashed tombs: clean outside, dead bones inside.","Hence “whited sepulcher.”"],"Hypocrisy, fair outside but corrupt within","Whited sepulcher"],
+["Beatitudes","⛰️ 🗣️ 😇",["Jesus preaches the Sermon on the Mount.","He blesses the meek, merciful, and peacemakers.","They’re called the Beatitudes."],"Humility and mercy are blessed","Sermon on the Mount"],
+["Judas","🗡️ 💋 🪙",["Judas, one of the twelve disciples, agrees to betray Jesus for 30 pieces of silver.","He identifies Jesus to soldiers with a kiss.","Overcome by guilt, he hangs himself."],"Betrayal, treachery, a traitor","kiss,30 pieces of silver,hanged"],
+["Last Supper","🍞 🍷 🕯️",["Jesus shares a final Passover meal with the twelve disciples.","He gives bread and wine as symbols of his body and blood.","He predicts Judas’s betrayal."],"Sacrifice, communion, final farewell","bread and wine,Garden of Gethsemane"],
+["Pontius Pilate","🙌 💧 🏛️",["Pilate, Roman governor, questions Jesus (“What is truth?”).","The crowd demands Barabbas be freed instead.","Pilate washes his hands to avoid blame."],"Avoiding responsibility, washing your hands of something","what is truth,washing his hands,Barabbas"],
+["Calvary","✝️ ⛰️ 🌑",["Jesus is crucified at Calvary (Golgotha).","He speaks his last words from the cross.","Joseph of Arimathea buries him."],"Ultimate sacrifice, suffering","Golgotha,Christ’s Last Words,Joseph of Arimathea"],
+["Doubting Thomas","🤨 ✋ 😲",["Jesus rises and appears to the disciples; Thomas is absent.","Thomas says he won’t believe unless he touches the wounds.","Jesus appears and lets him."],"Skepticism, needing proof","Doubting Thomas,Mary Magdalene,Road to Emmaus"],
+["Saul / Paul","💡 🐴 ✉️",["Saul persecutes Christians.","On the road to Damascus a blinding light stops him.","He converts, becomes Paul, and spreads the faith."],"Dramatic conversion, a sudden change of heart","Saul / Paul,Pentecost,Stephen,Peter"]
+];
+const $=id=>document.getElementById(id);let L=new Set,tab=0,cur=null;
+try{L=new Set(JSON.parse(localStorage.getItem(P("s"))||"[]"))}catch(e){}
+const save=()=>{try{localStorage.setItem(P("s"),JSON.stringify([...L]))}catch(e){}};
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+function prog(){$("pb").style.width=100*L.size/D.length+"%";$("pt").textContent=L.size+"/"+D.length+" stories learned · "+K.size+"/"+V.length+" vocab terms known"}
+function go(t){tab=t;for(let i=0;i<4;i++)$("t"+i).className=i==t?"on":"";[home,cards,quiz,vocab][t]()}
+function home(){$("app").innerHTML='<div class="grid">'+D.map((e,i)=>`<button class="tile ${L.has(i)?"done":""}" onclick="story(${i})"><span>${e[1].split(" ")[0]}</span><b>${e[0]}</b></button>`).join("")+"</div>";prog()}
+function story(i){const e=D[i];rr=()=>story(i);$("app").innerHTML=`<button onclick="home()">← All stories</button> <b style="font-size:20px">${e[1].split(" ")[0]} ${e[0]}</b><div class="two" style="margin-top:10px"><div>${vid(e[0])}</div><div>${e[2].map((p,k)=>`<div class="pr"><span class="em">${e[1].split(" ")[k]}</span><p>${p}</p></div>`).join("")}<div class="box" style="margin:8px 0"><b>Symbolizes:</b> ${e[3]}<div>${e[4].split(",").map(t=>`<span class="tag">${t}</span>`).join("")}</div></div><label><input type="checkbox" ${W.has(i)?"checked":""} onchange="W.has(${i})?W.delete(${i}):W.add(${i});sv2()"> Watched</label> <button class="pri" onclick="check(${i})">Quick check →</button></div></div>`}
+function mk(i){const e=D[i],o=sh(D.map((_,k)=>k).filter(k=>k!=i)).slice(0,3),t=Math.floor(Math.random()*3);
+if(t==0)return{q:"Which story is this? “"+e[2][1+Math.floor(Math.random()*2)]+"”",a:e[0],o:sh([i,...o].map(k=>D[k][0]))};
+if(t==1)return{q:"What does “"+e[0]+"” symbolize?",a:e[3],o:sh([i,...o].map(k=>D[k][3]))};
+const ts=e[4].split(",");return{q:"“"+ts[Math.floor(Math.random()*ts.length)]+"” comes from which story?",a:e[0],o:sh([i,...o].map(k=>D[k][0]))}}
+let Q=0,Sc=0,St=0,n=0,fin=null;
+function ask(i,total,done,c){cur=c||mk(i);$("app").innerHTML=`<div class="box"><div class="sub">${total?"Question "+(n+1)+" of "+total:"Score "+Sc+" · Streak "+St}</div><b>${cur.q}</b>${cur.o.map((x,k)=>`<button class="opt" onclick="pick(${k})">${x}</button>`).join("")}<div id="fb"></div></div>`;fin=done}
+function pick(k){const bs=document.querySelectorAll(".opt");bs.forEach((b,j)=>{b.disabled=true;if(cur.o[j]==cur.a)b.className="opt ok"});const r=cur.o[k]==cur.a;if(!r)bs[k].className="opt no";Sc+=r;St=r?St+1:0;$("fb").innerHTML=(r?"✅ Correct!":"❌ Not quite.")+` <button class="pri" onclick="fin()">Next →</button>`}
+function check(i){n=0;Sc=0;const nx=()=>{n++;if(n<3)ask(i,3,nx);else{if(Sc>=2){L.add(i);save()}$("app").innerHTML=`<div class="box"><h2>${Sc}/3 ${Sc>=2?"🎉 Learned!":"Almost! Reread and retry."}</h2><div class="row"><button onclick="story(${i})">Reread</button><button class="pri" onclick="home()">Next story</button></div></div>`;prog()}};ask(i,3,nx)}
+function quiz(){n=0;Sc=0;St=0;const nx=()=>Math.random()<.5?ask(0,0,nx,mv()):ask(Math.floor(Math.random()*D.length),0,nx);nx()}
+let deck=[],fl=false;
+function cards(){deck=sh(D.map((_,i)=>i));fl=false;card()}
+function card(){if(!deck.length){$("app").innerHTML='<div class="box"><h2>Deck done! 🎉</h2><button class="pri" onclick="cards()">Shuffle again</button></div>';return}const e=D[deck[0]];$("app").innerHTML=`<div class="sub">${deck.length} cards left</div><div class="box flip" onclick="fl=!fl;card()">${fl?`<div><b>${e[0]}</b><p>${e[2].join(" ")}</p><p><b>Symbolizes:</b> ${e[3]}</p></div>`:`<div><div style="font-size:60px">${e[1].split(" ")[0]}</div><b style="font-size:24px">${e[0]}</b><p class="sub">Tap to flip</p></div>`}</div><div class="row"><button onclick="deck.push(deck.shift());fl=false;card()">🔁 Again</button><button class="pri" onclick="deck.shift();fl=false;card()">✓ Got it</button></div>`}
+const V=`Acheron River||Underworld river of woe crossed by the dead
+Achilles||Greek hero of Troy, invulnerable except his heel; killed by Paris’s arrow
+Actaeon||Hunter who saw Artemis bathing; turned into a stag, killed by his own dogs
+Aegeus||Athenian king who leapt into the sea (Aegean) thinking his son Theseus was dead
+Aegisthus||Clytemnestra’s lover; helped murder Agamemnon
+Aeneas||Trojan hero who fled Troy and founded Rome’s line (Virgil’s Aeneid)
+Agamemnon||Greek king who led the Trojan War; murdered by his wife Clytemnestra
+Ajax||Huge Greek warrior at Troy; killed himself after losing Achilles’s armor
+Amazons||Tribe of fierce warrior women
+Andromache||Hector’s loyal wife; lost husband and son at Troy
+Andromeda||Princess chained to a rock as a sacrifice; rescued by Perseus
+Aphrodite|Venus|Goddess of love and beauty
+Antigone||Defied Creon to bury her brother Polyneices
+Apollo|Phoebus|God of sun, music, poetry, and prophecy
+Arachne||Weaver who challenged Athena and was turned into a spider
+Ares|Mars|God of war
+Argonauts||Jason’s crew who sailed for the Golden Fleece
+Argus||Hundred-eyed giant watchman
+Ariadne||Gave Theseus the thread to escape the labyrinth; abandoned on Naxos
+Artemis|Diana|Goddess of the hunt and the moon
+Atalanta||Swift huntress who lost a race when she stopped for golden apples
+Atlantis||Legendary island civilization swallowed by the sea
+Atlas||Titan forced to hold up the sky
+Atropos||The Fate who cuts the thread of life
+Aurora||Roman goddess of the dawn
+Bellerophon||Hero who rode Pegasus and killed the Chimaera
+Callisto||Nymph turned into a bear and placed in the sky
+Calypso||Nymph who kept Odysseus on her island for seven years
+Cassandra||Trojan prophetess cursed never to be believed
+Castor and Pollux||Twin brothers who became the constellation Gemini
+Centaurs||Half-man, half-horse creatures
+Cerberus||Three-headed dog guarding the Underworld
+Charon||Ferryman who rows the dead across the Styx
+Charybdis||Deadly whirlpool opposite Scylla
+Chimaera||Fire-breathing monster of lion, goat, and serpent
+Circe||Sorceress who turned Odysseus’s men into pigs
+Clytemnestra||Killed her husband Agamemnon; killed by her son Orestes
+Creon||King of Thebes who clashed with Antigone
+Cyclops||One-eyed giant; Polyphemus trapped Odysseus
+Daedalus||Inventor who built the Labyrinth and wings for himself and Icarus
+Danae||Mother of Perseus; Zeus came to her as golden rain
+Danaids||Daughters of Danaus condemned to carry water in leaky jars forever
+Daphne||Nymph who became a laurel tree to escape Apollo
+Delphi||Site of Apollo’s oracle
+Demeter|Ceres|Goddess of harvest; mother of Persephone
+Dido||Queen of Carthage who killed herself when Aeneas left
+Dionysus|Bacchus|God of wine and revelry
+Echo||Nymph who can only repeat others’ words; loved Narcissus
+Electra||Helped her brother Orestes avenge their father Agamemnon
+Elysian Fields||Paradise for heroes and the virtuous after death
+Eros|Cupid|God of love who shoots arrows
+Eteocles||Oedipus’s son who killed his brother Polyneices over Thebes
+Europa||Princess carried off by Zeus as a bull; Europe is named for her
+Eurydice||Orpheus’s wife; lost when he looked back leaving the Underworld
+Furies||Goddesses of vengeance who punish wrongdoers
+Galatea||Statue brought to life for Pygmalion
+Gorgons||Snake-haired sisters, including Medusa, whose gaze turns people to stone
+Graces (3)||Three goddesses of charm and beauty
+Hades|Pluto|God of the Underworld
+Harpies||Winged monsters that snatch food
+Hecate||Goddess of magic and crossroads
+Hector||Trojan prince and greatest warrior; killed by Achilles
+Hecuba||Queen of Troy; mother of Hector and Paris
+Helen||Wife of Menelaus; her abduction began the Trojan War
+Hephaestus|Vulcan|God of fire and the forge
+Hercules||Hero of great strength who performed twelve labors
+Hermes|Mercury|Winged messenger god
+Hestia|Vesta|Goddess of the hearth
+Hyacinth||Youth loved by Apollo; killed by a discus and became a flower
+Hydra||Many-headed serpent whose heads regrow; killed by Hercules
+Icarus||Flew too close to the sun with wax wings and fell
+Iphigenia||Agamemnon’s daughter, sacrificed so the ships could sail to Troy
+Iris||Goddess of the rainbow and divine messenger
+Ixion||Punished by being bound to a burning wheel forever
+Janus||Two-faced god of doors and beginnings
+Jason||Led the Argonauts to get the Golden Fleece
+Jocasta||Oedipus’s mother and wife
+Laocoon||Priest who warned about the Trojan Horse; killed by sea serpents
+Leda||Mother of Helen; visited by Zeus as a swan
+Lethe River||Underworld river of forgetfulness
+Medea||Sorceress who helped Jason, then killed her children in revenge
+Medusa||Gorgon with snakes for hair; beheaded by Perseus
+Menelaus||King of Sparta; Helen’s husband
+Mentor||Odysseus’s wise friend; now means a trusted advisor
+Midas||King whose touch turned everything to gold
+Minos||King of Crete who kept the Minotaur
+Minotaur||Half-man, half-bull monster in the Labyrinth
+Morpheus||God of dreams
+Muses (9)||Goddesses of the arts and inspiration
+Narcissus||Fell in love with his own reflection
+Nausicaa||Princess who helped shipwrecked Odysseus
+Nemesis||Goddess of retribution; now means a rival or downfall
+Niobe||Boastful mother whose children were killed; she wept until turned to stone
+Odysseus|Ulysses|Clever hero of the Odyssey; ten years getting home from Troy
+Oedipus||Unknowingly killed his father and married his mother
+Olympus||Mountain home of the gods
+Orestes||Avenged Agamemnon by killing his mother Clytemnestra
+Orion||Giant hunter placed in the sky as a constellation
+Orpheus||Musician who charmed Hades; lost Eurydice by looking back
+Pallas Athena|Minerva|Goddess of wisdom and strategic war
+Pan||Goat-legged god of shepherds; “panic” comes from him
+Pandora||First woman; opened a jar that released evils, leaving only hope
+Paris||Trojan prince who took Helen
+Parnassus||Mountain sacred to Apollo and the Muses
+Pegasus||Winged horse
+Penelope||Odysseus’s faithful wife who waited twenty years
+Persephone||Taken by Hades; her time below causes winter
+Perseus||Hero who killed Medusa and rescued Andromeda
+Polyneices||Oedipus’s son; Antigone buried him against Creon’s law
+Poseidon|Neptune|God of the sea and earthquakes
+Priam||King of Troy; father of Hector and Paris
+Prometheus||Titan who stole fire for humans and was punished
+Proteus||Sea god who can change shape
+Psyche||Mortal loved by Eros; her name means soul
+Pygmalion||Sculptor who fell in love with his statue
+Pyramus||Lover of Thisbe; killed himself believing her dead
+Scylla||Six-headed sea monster opposite Charybdis
+Sirens||Seductive singers who lure sailors to wreck
+Sisyphus||Condemned to roll a boulder uphill forever
+Sphinx||Monster whose riddle Oedipus solved
+Stentor||Herald with an enormously loud voice
+Styx River||Underworld river; gods swear oaths by it
+Tantalus||Punished with food and water just out of reach
+Telemachus||Odysseus’s son who searched for his father
+Theseus||Athenian hero who slew the Minotaur
+Thetis||Sea nymph; Achilles’s mother
+Thisbe||Pyramus’s lover; killed herself after finding him dead
+Tiresias||Blind prophet of Thebes
+Triton||Son of Poseidon, sea god with a conch shell
+Zeus|Jupiter|King of the gods; god of sky and thunder`.split("\n").map(l=>l.split("|"));
+let K=new Set,W=new Set;try{K=new Set(JSON.parse(localStorage.getItem(P("v"))||"[]"));W=new Set(JSON.parse(localStorage.getItem(P("w"))||"[]"))}catch(e){}
+const sv2=()=>{try{localStorage.setItem(P("v"),JSON.stringify([...K]));localStorage.setItem(P("w"),JSON.stringify([...W]))}catch(e){}};
+let M={};try{M=JSON.parse(localStorage.getItem(P("m"))||"{}")}catch(e){}
+const VID={"Cain and Abel":["bzydikSjXdY","gk9W2SqxRJI"],"Adam and Eve":["c5cTvtumMxI"],"Noah and the Flood":["0cUepF0fnh8"],"David and Goliath":["6O9BRXTtTKQ"],"Pandora":["yWGKy9yrHu0"]};
+const yid=u=>{const m=(u||"").match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/);return m&&m[1]};
+function vid(n){const id=M[n]?yid(M[n]):(VID[n]||[])[0],alt=(VID[n]||[])[1];return (id?`<div class="vw"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${n}" loading="lazy" allowfullscreen allow="encrypted-media; picture-in-picture"></iframe></div>`+(alt&&!M[n]?`<div class="sub"><a href="https://www.youtube.com/watch?v=${alt}" target="_blank" rel="noopener">Alternate video</a></div>`:""):`<div class="box" style="margin:0">No video saved yet. <a href="${yt(n+' short explained')}" target="_blank" rel="noopener">▶ Find one on YouTube</a>, then paste its link below.</div>`)+`<div class="row" style="margin-top:6px;flex-wrap:nowrap"><input class="in" placeholder="Paste a YouTube link…"><button data-n="${n}" onclick="sl(this)" style="flex:1">Save</button></div>`}
+function sl(b){const u=b.previousElementSibling.value.trim();if(!yid(u)){alert("Couldn’t read that YouTube link.");return}M[b.dataset.n]=u;try{localStorage.setItem(P("m"),JSON.stringify(M))}catch(e){}rr()}
+function who(){let us=[];try{us=JSON.parse(localStorage.getItem("aa:users")||"[]")}catch(e){}$("app").innerHTML=`<div class="box"><h2>Who’s studying?</h2>${us.map(u=>`<button class="opt" data-u="${u}" onclick="su(this.dataset.u)">👤 ${u}</button>`).join("")}<input class="in" id="nm" placeholder="Type your name…" style="width:100%;box-sizing:border-box;margin:8px 0"><button class="pri opt" onclick="su($('nm').value)">Start</button></div>`}
+function su(n){n=(n||"").replace(/[<>&"]/g,"").trim();if(!n)return;try{let us=JSON.parse(localStorage.getItem("aa:users")||"[]");if(!us.includes(n))us.push(n);localStorage.setItem("aa:users",JSON.stringify(us));localStorage.setItem("au",n);location.reload()}catch(e){U=n;go(0)}}
+const yt=q=>"https://www.youtube.com/results?search_query="+encodeURIComponent(q);
+function vocab(){rr=vl;$("app").innerHTML=`<input id="vs" placeholder="Search terms…" oninput="vl()" style="width:100%;box-sizing:border-box;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit"><div class="sub">Greek &amp; Roman terms. Tap “Mark known” as you learn them.</div><div id="vl"></div>`;vl();prog()}
+function vl(){const s=($("vs").value||"").toLowerCase();$("vl").innerHTML=V.map((v,i)=>({v,i})).filter(o=>o.v.join(" ").toLowerCase().includes(s)).map(({v,i})=>`<div class="box" style="margin:6px 0"><div class="row" style="align-items:center"><b style="flex:3">${v[0]}${v[1]?" <span class='sub'>("+v[1]+")</span>":""}</b><button onclick="tk(${i})" style="flex:1">${K.has(i)?"✅ Known":"Mark known"}</button></div><div>${v[2]}</div><details><summary>▶ Video</summary>${vid(v[0].replace(/ \(.*/,''))}</details></div>`).join("")}
+function tk(i){K.has(i)?K.delete(i):K.add(i);sv2();vl();prog()}
+function mv(){const i=Math.floor(Math.random()*V.length),o=sh(V.map((_,k)=>k).filter(k=>k!=i)).slice(0,3);return{q:"Who or what is “"+V[i][0]+"”?",a:V[i][2],o:sh([i,...o].map(k=>V[k][2]))}}
+$("wh").innerHTML=U?`👤 ${U} · <a href="#" onclick="who();return false">switch person</a>`:"";U?go(0):who();
+</script></body></html>
